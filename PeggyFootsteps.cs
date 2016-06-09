@@ -1,11 +1,8 @@
 //	PeggyFootsteps.cs
 //--------------------------------------------------------------------------------------
-// Title: PeggyFootsteps
-// Author: Peggworth the Pirate
-// Description:  Footsteps that change noise based on what you touch below you.
-//	
-//				A set of footsteps ripped from an old diablo-esque game, and from 'FreeSound.org'.
-//				We shall call them peggsteps and they will be the best.
+// Title:			PeggyFootsteps
+// Author: 			Peggworth the Pirate
+// Description:		Footsteps that change noise based on what you touch below you.
 //--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
@@ -14,16 +11,15 @@
 
 function rgbToHex(%rgb) //! Ripped from Greek2Me's SLAYER
 {
-	//use % to find remainder
+	// use % to find remainder
 	%r = getWord(%rgb,0);
-	if(%r <= 1)
-		%r = %r * 255;
 	%g = getWord(%rgb,1);
-	if(%g <= 1)
-		%g = %g * 255;
 	%b = getWord(%rgb,2);
-	if(%b <= 1)
-		%b = %b * 255;
+	// in-case the rgb value isn't on the right scale
+	%r = ( %r <= 1 ) ? %r * 255 : %r;
+	%g = ( %g <= 1 ) ? %g * 255 : %g;
+	%b = ( %b <= 1 ) ? %b * 255 : %b;
+	// the hexidecimal numbers
 	%a = "0123456789ABCDEF";
 
 	%r = getSubStr(%a,(%r-(%r % 16))/16,1) @ getSubStr(%a,(%r % 16),1);
@@ -33,132 +29,104 @@ function rgbToHex(%rgb) //! Ripped from Greek2Me's SLAYER
 	return %r @ %g @ %b;
 }
 
+
 //--------------------------------------------------------------------------------------
-//		Main Functions:
+//		Footstep Deciders:
 //--------------------------------------------------------------------------------------
 
-//++	A function that returns the sound datablock based off the surface.
+//+++	Return the sound datablock based off the surface.
 function PeggFootsteps_getSound(%surface, %speed)
 {
-  // there is no different sounds for running and walking while swimming, so this is retrieved regardless of speed.
-	if ( %surface $= "under water" )	
-	{
-		return $StepSwimming[getRandom(1,6)];
-	}
-  //walking
-	else if ( %speed $= "walking" )		
-	{
-		if ( %surface $= "metal" )    // there are only 3 sound FX for metal steps, in both walking and running.
-		{
-			return $StepMetalW[getRandom(1,3)];
+		switch$ ( %surface )
+		{	
+			// swimmingfx only has one speed. There is no walking speed for swimmingfx.
+			case "under water":   
+				return $StepSwimming[getRandom(1,6)];
+			
+			case "metal":
+				if ( %speed $= "walking" )
+					return $StepMetalW[getRandom(1,3)];
+				else
+					return $StepMetalR[getRandom(1,3)];
+			
+			case "dirt":
+				if ( %speed $= "walking" )
+					return $StepDirtW[getRandom(1,4)];
+				else
+					return $StepDirtR[getRandom(1,6)];
+		
+			case "grass":
+				if ( %speed $= "walking" )
+					return $StepGrassW[getRandom(1,4)];
+				else
+					return $StepGrassR[getRandom(1,6)];
+		
+			case "stone":
+				if ( %speed $= "walking" )
+					return $StepStoneW[getRandom(1,4)];
+				else
+					return $StepStoneR[getRandom(1,6)];
+		
+			case "water":
+				if ( %speed $= "walking" )
+					return $StepWaterW[getRandom(1,4)];
+				else
+					return $StepWaterR[getRandom(1,6)];
+		
+			case "wood":
+				if ( %speed $= "walking" )
+					return $StepWoodW[getRandom(1,4)];
+				else
+					return $StepWoodR[getRandom(1,6)];
+			
+			case "sand":
+				if ( %speed $= "walking" )
+					return $StepSandW[getRandom(1,4)];
+				else
+					return $StepSandR[getRandom(1,6)];
+			
+			case "basic":
+				if ( %speed $= "walking" )
+					return $StepBasicW[getRandom(1,4)];
+				else
+					return $StepBasicR[getRandom(1,4)];
+			
+			// snowsteps only have one speed. There is no walking sound effect for snowsteps
+			case "snow" :		
+				return $StepSnowR[getRandom(1,3)];
 		}
-		else if ( %surface $= "dirt" )
-		{
-			return $StepDirtW[getRandom(1,4)];
-		}
-		else if ( %surface $= "grass" )
-		{
-			return $StepGrassW[getRandom(1,4)];
-		}
-		else if ( %surface $= "stone" )
-		{
-			return $StepStoneW[getRandom(1,4)];
-		}
-		else if ( %surface $= "water" )
-		{
-			return $StepWaterW[getRandom(1,4)];
-		}
-		else if ( %surface $= "wood" )
-		{
-			return $StepWoodW[getRandom(1,4)];
-		}		
-    else if ( %surface $= "sand" )
-		{
-			return $StepSandW[getRandom(1,4)];
-		}
-		else if ( %surface $= "snow" )		// there is only 1 snow sound global array, and it's for running, so the global variable still has the 'R', not a 'W'
-		{
-			return $StepSnowR[getRandom(1,3)];
-		}
-	}
-  // running
-	else		
-	{
-		if ( %surface $= "metal" )    // there are only 3 sound FX for metal steps, in both walking and running.
-		{
-			return $StepMetalR[getRandom(1,3)];
-		}
-		else if ( %surface $= "dirt" )
-		{
-			return $StepDirtR[getRandom(1,6)];
-		}		
-    else if ( %surface $= "sand" )
-		{
-			return $StepSandR[getRandom(1,6)];
-		}
-		else if ( %surface $= "grass" )
-		{
-			return $StepGrassR[getRandom(1,6)];
-		}
-		else if ( %surface $= "stone" )
-		{
-			return $StepStoneR[getRandom(1,6)];
-		}
-		else if ( %surface $= "water" )
-		{
-			return $StepWaterR[getRandom(1,6)];
-		}
-		else if ( %surface $= "wood" )
-		{
-			return $StepWoodR[getRandom(1,6)];
-		}
-		else if ( %surface $= "snow" )
-		{
-			return $StepSnowR[getRandom(1,3)];
-		}
-	}
 }
 
-//++ 	A function that calculates the noice that will need to be produced.
-function colorcheck_playback(%obj)
+//+++ 	Calculate the noise based off what the player is stepping on.
+function checkPlayback(%obj)
 {	
-	%surface = %obj.touchcolor;
+	%surface = ( %obj.touchcolor $= "" ) ? %obj.surface : %obj.touchColor;
+	%speed = ( %obj.isSlow == 0 ) ? "running" : "walking";
 	
-	if ( %surface $= "under water" )
-	{	
-		return PeggFootsteps_getSound(%surface);
-	}
-	if(%obj.isSlow == 0)
-	{	
-		%speed = "running";
-	}
-	else
-	{	
-		%speed = "walking";
-	}	
-	if(%surface $= "metal")
-	{
+	if ( %obj.touchColor $= "" )
+	{		
 		return PeggFootsteps_getSound(%surface, %speed);
 	}
-	else		
+	else
 	{
 		%r = getWord(%surface, 0) * 255;
 		%g = getWord(%surface, 1) * 255;
 		%b = getWord(%surface, 2) * 255;
 		
-    for ( %i = 0; %i < $Pref::Server::PF::customsounds; %i++ )
-    {
-      %hit = $Pref::Server::PF::colorPlaysFX[%i];
-      %hitcolor = getWords(%hit, 0, 3);
-      %hr = getWord(%hitcolor, 0) * 255;
-      %hg = getWord(%hitcolor, 1) * 255;
-      %hb = getWord(%hitcolor, 2) * 255;
-      if ( %hr == %r && %hg == %g && %hb == %b)
-      {
-        %hitsound = getWord(%hit, 4);
-        return PeggFootsteps_getSound(%hitsound, %speed);
-      }
-    }
+		for ( %i = 0; %i < $Pref::Server::PF::customsounds; %i++ )
+		{
+			%hit = $Pref::Server::PF::colorPlaysFX[%i];
+			%hitcolor = getWords(%hit, 0, 3);
+			%hr = getWord(%hitcolor, 0) * 255;
+			%hg = getWord(%hitcolor, 1) * 255;
+			%hb = getWord(%hitcolor, 2) * 255;
+			if ( %hr == %r && %hg == %g && %hb == %b)
+			{
+				%hitsound = getWord(%hit, 4);
+				return PeggFootsteps_getSound(%hitsound, %speed);
+			}
+		}
+
 		if (%r >= %b && %b >= %g || (%r > 180 && %g > 180))
 		{
 			%surface = "dirt";
@@ -191,446 +159,203 @@ function colorcheck_playback(%obj)
 	return PeggFootsteps_getSound(%surface, %speed);
 }
 
+//+++ Return the surface's name when given a number from a list.
+function parseSoundFromNumber(%val, %obj)
+{
+	//Default 0 Basic 1 Dirt 2 Grass 3 Metal 4 Sand 5 Snow 6 Stone 7 Water 8 Wood 9
+	switch ( %val )
+	{
+		case 0:
+			if ( %obj == -1 )
+			{
+				return "by color";
+			}
+			else
+			{
+				if ( isObject(%obj.lastBrick) && getColorIDTable(%obj.lastBrick.getColorId()) !$= "" )
+				{
+					return "";
+				}
+				return parseSoundFromNumber($Pref::Server::PF::defaultStep, %obj);
+			}
+		case 1:
+			return "basic";
+		case 2:
+			return "dirt";
+		case 3:
+			return "grass";
+		case 4:
+			return "metal";
+		case 5:
+			return "sand";
+		case 6:
+			return "snow";
+		case 7:
+			return "stone";
+		case 8:
+			return "water";
+		case 9:
+			return "wood";
+	}
+}
 
-//--------------------------------------------------------------------------------------
-//		Package:
-//			The actual functions where sounds are produced.		
-//--------------------------------------------------------------------------------------
-
+//+++ When any lifeform spawns, create a footstep loop.
 deactivatepackage(peggsteps);
 package peggsteps
 {	
-	//++ When any creature spawns, start peggstepping.
 	function Armor::onNewDatablock(%this, %obj)
 	{
-		if($Pref::Server::PF::footstepsEnabled == 0) 
-		{
-			return parent::onNewDatablock(%this, %obj);
-		}
-		if (%this.rideable) 
-		{
-			return parent::onNewDatablock(%this, %obj);
-		}
-		%obj.touchcolor = "0.5 0.5 0.5";
+		// creatures like horses won't make footsteps, but other AI will
+		if ( %this.rideable )	return parent::onNewDatablock(%this, %obj);
+		%obj.touchcolor = "";
+		%obj.surface = parseSoundFromNumber($Pref::Server::PF::defaultStep, %obj);
 		%obj.isSlow = 0;
 		%obj.peggstep = schedule(50,0,PeggFootsteps,%obj);
 		return parent::onNewDatablock(%this, %obj);
-	}
-	
-	//++ When any creature crouches, pay attention and take note!
-	function Armor::onTrigger(%data,%obj,%slot,%val)
-	{
-		if(%slot == 3)
-		{
-			%obj.isProning = %val;
-		}
-		return Parent::onTrigger(%data,%obj,%slot,%val);
-	}
-	
-	//++ (next two) When a creature enters or exits water, take note!
-	function Armor::onEnterLiquid(%data,%obj, %cov, %type)
-	{
-		%obj.isSwimming=1;
-		return Parent::onEnterLiquid(%data,%obj, %cov, %type);
-	}
-	function Armor::onLeaveLiquid(%data,%obj, %cov, %type)
-	{
-		%obj.isSwimming=0;
-		return Parent::onLeaveLiquid(%data,%obj, %cov, %type);
-	}
-	//++ Drop some rad peggstep noise in here!
-	function PeggFootsteps(%obj)
-	{	
-		if($Pref::Server::PF::footstepsEnabled == 1 && isObject(%obj))
-		{	
-			cancel(%obj.peggstep);	
-			%pos = %obj.getPosition();
-			%xyP = getWords(%pos,0,1);
-			%vel = %obj.getVelocity();
-			//! Ripped from Hata's support_footstep.cs
-			%posA = %obj.getPosition();
-			initContainerBoxSearch(%posA, "1.25 1.25 0.1", $TypeMasks::fxBrickObjectType|$Typemasks::TerrainObjectType);
-			%colA = containerSearchNext();
-			%posB = vectorAdd(%posA,"0 0 0.5");
-			initContainerBoxSearch(%posB, "1.25 1.25 0.1", $TypeMasks::fxBrickObjectType|$Typemasks::TerrainObjectType);
-			%colB = containerSearchNext();
-			if(isObject(%colA) && %colA != %colB == true)
-			{	
-				if (%colA.getClassName() $= "fxDTSbrick")
-				{
-					%obj.touchcolor = getColorIDTable(%colA.getColorId()); 
-					if( $Pref::Server::PF::specialMetalSFX && (%colA.getColorFxID() == 1 || %colA.getColorFxID() == 2) )	// if the surface has a chrome or pearl special fx applied, then play the metal sound fx.
-					{  
-						%obj.touchcolor = "metal";	
-					}
-				}
-				else
-				{
-					%obj.touchcolor = "0.5 0.5 0.5";
-				}
-				%isGround = true;
-			}
-			else
-			{	
-				%isGround = false;
-			}
-			if(mAbs(getWord(%vel,0)) < $Pref::Server::PF::runningMinSpeed && mAbs(getWord(%vel,1)) < $Pref::Server::PF::runningMinSpeed)
-			{	
-				%obj.isSlow = 1;
-			}
-			else
-			{
-				%obj.isSlow = 0;
-			}
-			if(%obj.lastXY $= %xyP || %obj.isProning || !%isGround)
-			{
-				if(%obj.swimskip != 1)
-				{ 
-					%obj.swimskip = 1;
-				}
-				else
-				{
-					%obj.swimskip = 0;
-				}
-				if(%obj.isSwimming == 1 && $Pref::Server::PF::waterSFX == 1 && %obj.lastXY !$= %xyP)
-				{	
-					%obj.lastXY = %xyP;
-					%obj.touchcolor = "water";
-					if(%obj.swimskip == 0)
-					{ 
-						serverplay3d(colorcheck_playback(%obj),%obj.getHackPosition());
-					}
-					cancel(%obj.peggstep);
-					%obj.peggstep = schedule(500,0,PeggFootsteps,%obj);
-					return;
-				}
-				%obj.lastXY = %xyP;
-				cancel(%obj.peggstep);
-				%obj.peggstep = schedule(50,0,PeggFootsteps,%obj);
-				return;
-			}
-			serverplay3d(colorcheck_playback(%obj),%obj.getHackPosition());
-			%obj.lastXY = %xyP;
-			%obj.peggstep = schedule(320,0,PeggFootsteps,%obj);
-		}
-	}
+	}	
 };
 activatepackage(peggsteps);
 
 
 //--------------------------------------------------------------------------------------
-//		Commands:
-//			Helpful ingame controls to start and stop peggstepping!
+//		Footstep Playback:
 //--------------------------------------------------------------------------------------
 
-//++-- Toggle Prefs:
-function servercmdToggle(%client, %toggle)
-{
-	if(!%client.isAdmin && !%client.isSuperAdmin)
-	{	
-		messageClient(%client,'',"<color:ff0000>You dingus!<color:ffff00> Narry a man, save admin or super admin, hath the divine power to do hither command!");
-	}
-	else if ( %toggle $= "SwimmingFX" )
-	{	
-		if($Pref::Server::PF::waterSFX == 0)
-		{
-			messageClient(%client,'',"<color:00ff00>You have activated the swimming sound fx package.");
-			chatMessageAll('',"<color:ffffff>Swimming sound effects are now enabled.");
-			$Pref::Server::PF::waterSFX = 1;
-		}
-		else
-		{
-			messageClient(%client,'',"<color:ff0000>You have de-activated the swimming sound fx package.");
-			chatMessageAll('',"<color:ff0000>Swimming sound effects are now disabled.");
-			$Pref::Server::PF::waterSFX = 0;
-		}
-	}
-	else if ( %toggle $= "footsteps" )
-	{	
-		if($Pref::Server::PF::footstepsEnabled == 0)
-		{
-			messageClient(%client,'',"<color:00ff00>You have activated the footstep sound fx package.");
-			chatMessageAll('',"<color:ffffff>Footstep sound effects are now enabled.");
-			$Pref::Server::PF::footstepsEnabled = 1;
-		}
-		else
-		{
-			messageClient(%client,'',"<color:ff0000>You have de-activated the footstep sound fx package.");
-			chatMessageAll('',"<color:ff0000>Footstep sound effects are now disabled.");
-			$Pref::Server::PF::footstepsEnabled = 0;
-		}
-	}
-	else if ( %toggle $= "MetalSpecialFX" )
-	{
-		if($Pref::Server::PF::specialMetalSFX == 0)
-		{
-			messageClient(%client,'',"<color:00ff00>You have activated the special metal sound fx package.");
-			chatMessageAll('',"<color:ffffff>Special metal sound effects are now enabled.");
-			$Pref::Server::PF::specialMetalSFX = 1;
-		}
-		else
-		{
-			messageClient(%client,'',"<color:ff0000>You have de-activated the special metal sound fx package.");
-			chatMessageAll('',"<color:ff0000>Special metal sound effects are now disabled.");
-			$Pref::Server::PF::specialMetalSFX = 0;
-		}
-	}
-	else
-	{
-		if ( %toggle $= "" )
-		{
-			messageClient(%client,'',"<color:ff0000>You must enter a parameter to use this command. Use '/pegghelp' to learn more.");
-		}
-		else
-		{
-			messageClient(%client,'',"<color:ff0000>" @ %toggle @ " is not a valid parameter. Use '/pegghelp' to learn more.");
-		}
-	}
-}
-
-//++-- Running Speed:
-function servercmdSetMinRunSpeed(%client, %value)
-{
-	if(!%client.isAdmin && !%client.isSuperAdmin)
-	{	
-		messageClient(%client,'',"<color:ff0000>You dingus!<color:ffff00> Narry a man, save admin or super admin, hath the divine power to do hither command!");
-	}
-	else
-	{	
-		if(%value > 50)
-		{
-			messageClient(%client,'',"<color:ffffff>That value is too high to use as the minimum running speed.");
-			return;
-		}
-		if(%value <= 0)
-		{
-			messageClient(%client,'',"<color:ffffff>That value is too low to use as the minimum runnings speed.");
-			return;
-		}
-		$Pref::Server::PF::runningMinSpeed = %value;
-		messageClient(%client,'',"<color:ffffff>You have now set the minimum running value to " @ %value @ ". Gowing below this speed will play a walking noise instead of running.");
-	}
-}
-
-//++-- Basic help command
-function servercmdpegghelp(%client)
-{
-	messageClient(%client,'',"\c6The following is a list of admin commands for the \c3PeggyFootsteps\c6 add-on:");
-	messageClient(%client,'',"\c6/toggle Footsteps");
-	messageClient(%client,'',"\c6/toggle MetalSpecialFX");
-	messageClient(%client,'',"\c6/toggle SwimmingFX");
-	messageClient(%client,'',"\c6/getPeggstepPrefs");
-	messageClient(%client,'',"\c6/getCustomSounds");
-	messageClient(%client,'',"\c6/setMinRunSpeed \c0<\c3decimal value\c0>\c6");
-	messageClient(%client,'',"\c6/setColorToSound \c0<\c3sound\c0>\c6 (This command will set the current color you have selected on your paint selector to play a sound you select.)");
-	messageClient(%client,'',"\c6/clearCustomSounds (This command will remove all custom SFX)");
-	messageClient(%client,'',"\c6/clearCustomSound (This command will remove the SFX for the color currently selected on your paint selector.)");
-}
-
-//--------------------------------------------------------------------------------------
-//		 Assigning custom sounds to colors.
-//--------------------------------------------------------------------------------------
-
-//++ Clear the custom list.
-function servercmdClearCustomSounds(%client)
-{
-	if(!%client.isAdmin && !%client.isSuperAdmin)
-	{	
-		messageClient(%client,'',"<color:ff0000>You dingus!<color:ffff00> Narry a man, save admin or super admin, hath the divine power to do hither command!");
-		return;
-	}
-	messageClient(%client,'',"\c6You have cleared all the custom foostep SFX for each color of brick.");
-  for ( %i = 0; %i < $Pref::Server::PF::customsounds; %i++ )
-  {
-    $Pref::Server::PF::colorPlaysFX[%i] = "";
-  }
-  $Pref::Server::PF::customsounds = 0;
-}
-
-//++ Clear a single entry on the custom list
-function servercmdClearCustomSound(%client)
-{
-	if(!%client.isAdmin && !%client.isSuperAdmin)
-	{	
-		messageClient(%client,'',"<color:ff0000>You dingus!<color:ffff00> Narry a man, save admin or super admin, hath the divine power to do hither command!");
-		return;
-	}
-  %color = getColorIDTable(%client.currentColor);
-  	%r = getWord(%color, 0) * 255;
-		%g = getWord(%color, 1) * 255;
-		%b = getWord(%color, 2) * 255;
-	%hex = rgbToHex(%color);
-  for ( %i = 0; %i < $Pref::Server::PF::customsounds; %i++ )
-  {
-    %hit = $Pref::Server::PF::colorPlaysFX[%i];
-    %hitcolor = getWords(%hit, 0, 3);
-      %hr = getWord(%hitcolor, 0) * 255;
-      %hg = getWord(%hitcolor, 1) * 255;
-      %hb = getWord(%hitcolor, 2) * 255;
-    // if there's a match, delete it.
-    if ( %hr == %r && %hg == %g && %hb == %b)
-    {
-      $Pref::Server::PF::colorPlaysFX[%i] = "";
-      // if the match isn't the last one in the list, update the list to fill the hole made by removing the hit.
-      if ( %i < $Pref::Server::PF::customsounds-1 )
-      {
-        for ( %j = %i; %j < $Pref::Server::PF::customsounds; %j++ )
-        {
-          if ( %j < $Pref::Server::PF::customsounds-1 )
-          {
-            $Pref::Server::PF::colorPlaysFX[%j] = $Pref::Server::PF::colorPlaysFX[%j+1];
-            $Pref::Server::PF::colorPlaysFX[%j+1] = "";
-          }
-          else
-          {
-            $Pref::Server::PF::colorPlaysFX[%j] = "";
-          }
-        }
-      }
-      $Pref::Server::PF::customsounds--;
-      messageClient(%client,'',"\c6You have cleared the custom sound for <color:" @ %hex @ ">THIS COLOR\c6.");
-      break;
-    }          
-    else if ( %i == $Pref::Server::PF::customsounds-1 )
-    {
-      messageClient(%client,'',"\c0Error.\c6 There was no sound effect found for <color:" @ %hex @ ">THIS COLOR\c6.");
-    }
-  }
-}
-
-//++ Get a list of custom sounds.
-function servercmdGetCustomSounds(%client)
-{
-	if(!%client.isAdmin && !%client.isSuperAdmin)
-	{	
-		messageClient(%client,'',"<color:ff0000>You dingus!<color:ffff00> Narry a man, save admin or super admin, hath the divine power to do hither command!");
-		return; 
-	}
-  messageClient(%client,'',"\c5List of Custom Sounds for Each Color:");
-  for ( %i = 0; %i < $Pref::Server::PF::customsounds; %i++ )
-  {
-    %hit = $Pref::Server::PF::colorPlaysFX[%i];
-    %hitcolor = getWords(%hit, 0, 3);
-    %hitsound = getWord(%hit, 4);
-    %hex =  rgbToHex(%hitcolor); 
-    messageClient(%client,'',"<color:" @ %hex @ ">THIS COLOR\c6 is assigned to the sound \c4" @ %hitsound @ "\c6.");	
-  }
-}
-
-function servercmdGetPeggstepPrefs(%client)
-{
-	if(!%client.isAdmin && !%client.isSuperAdmin)
-	{	
-		messageClient(%client,'',"<color:ff0000>You dingus!<color:ffff00> Narry a man, save admin or super admin, hath the divine power to do hither command!");
-		return; 
-	}
-  messageClient(%client,'',"<color:ffffff>Footsteps Enabled: " @ $Pref::Server::PF::footstepsEnabled ? "<color:00ff00>enabled" : "<color:ff0000>disabled");
-  messageClient(%client,'',"<color:ffffff>Swimming SoundFX: " @ $Pref::Server::PF::waterSFX ? "<color:00ff00>enabled" : "<color:ff0000>disabled");
-  messageClient(%client,'',"<color:ffffff>Special Metal SoundFX" @ $Pref::Server::PF::specialMetalSFX ? "<color:00ff00>enabled" : "<color:ff0000>disabled");
-  messageClient(%client,'',"<color:ffffff>Running Minimum Speed: <color:ffff00>" @ $Pref::Server::PF::runningMinSpeed);
-}
-
-//++ Set a color to a new footstep.
-function servercmdSetColorToSound(%client, %sound)
+//+++ Drop some rad peggstep noise in here!
+function PeggFootsteps(%obj)
 {	
-	if(!%client.isAdmin && !%client.isSuperAdmin)
+	cancel(%obj.peggstep);	
+	if($Pref::Server::PF::footstepsEnabled == 1 && isObject(%obj))
 	{	
-    messageClient(%client,'',"<color:ff0000>You dingus!<color:ffff00> Narry a man, save admin or super admin, hath the divine power to do hither command!");
-		return; 
-  }
-	%color = getColorIDTable(%client.currentColor);
-	%hex = rgbToHex(%color);
-  %i = 0;
-	%sounds[%i]   = "water";
-	%sounds[%i++] = "stone";
-	%sounds[%i++] = "grass";
-	%sounds[%i++] = "snow";
-	%sounds[%i++] = "wood";
-	%sounds[%i++] = "metal";
-	%sounds[%i++] = "dirt";
-	%sounds[%i++] = "sand";
-	%match = false;
-	for (%a=0;%a<=%i;%a++)
-	{
-		if(trim(%sound)$=%sounds[%a])
-		{	
-			%match = true;
-			break;
-		}
-	}
-	if(!%match)
-	{
-		messageClient(%client,'',"\c6There is no sound with the name \c0" @ trim(%sound) @ "\c6." NL "The sounds you can choose are:");
-		for (%a=0;%a<=%i;%a++)
+		if ( %obj.isMounted() )
 		{
-			messageClient(%client,'',"\c5 - " @ %sounds[%a]);
+			%obj.peggstep = schedule(50,0,PeggFootsteps,%obj);
+			return;
+		}
+		//! Ripped from Hata's support_footstep.cs
+		%pos = %obj.getPosition();
+		%xyP = getWords(%pos,0,1);
+		%vel = %obj.getVelocity();
+		%posA = %obj.getPosition();
+		initContainerBoxSearch(%posA, "1.25 1.25 0.1", $TypeMasks::fxBrickObjectType | $Typemasks::TerrainObjectType | $TypeMasks::VehicleObjectType);
+		%colA = containerSearchNext();
+		%posB = vectorAdd(%posA,"0 0 0.5");
+		initContainerBoxSearch(%posB, "1.25 1.25 0.1", $TypeMasks::fxBrickObjectType | $Typemasks::TerrainObjectType | $TypeMasks::VehicleObjectType);
+		%colB = containerSearchNext();
+		//	echo(%type);
+		if( isObject(%colA) && %colA != %colB )
+		{	
+			%type = %colA.getClassName();
+			if (  %type $= "fxDTSbrick" && %colA.isRendering() )
+			{
+					%obj.lastBrick =  %colA;
+					// by default, the surface isn't decided yet, and will be decided by the color
+					%obj.touchColor = getColorIDTable(%colA.getColorId()); 		
+					%obj.surface = "";
+					// check to see if there is a custom sound based on the brick's special FX
+					if ( $Pref::Server::PF::brickFXsounds::enabled )
+					{
+						switch ( %colA.getColorFxID() )
+						{
+							case 1:				
+								%obj.touchColor = "";
+								%obj.surface = parseSoundFromNumber($Pref::Server::PF::brickFXsounds::pearlStep, %obj);
+							case 2:				
+								%obj.touchColor = "";
+								%obj.surface = parseSoundFromNumber($Pref::Server::PF::brickFXsounds::chromeStep, %obj);
+							case 3:
+								%obj.touchColor = "";
+								%obj.surface = parseSoundFromNumber($Pref::Server::PF::brickFXsounds::glowStep, %obj);
+							case 4:	
+								%obj.touchColor = "";
+								%obj.surface = parseSoundFromNumber($Pref::Server::PF::brickFXsounds::blinkStep, %obj);
+							case 5:
+								%obj.touchColor = "";
+								%obj.surface = parseSoundFromNumber($Pref::Server::PF::brickFXsounds::swirlStep, %obj);
+							case 6:
+								%obj.touchColor = "";
+								%obj.surface = parseSoundFromNumber($Pref::Server::PF::brickFXsounds::rainbowStep, %obj);
+						}
+						if ( %colA.getShapeFxID() )
+						{
+							%obj.touchColor = "";
+							%obj.surface = parseSoundFromNumber($Pref::Server::PF::brickFXsounds::unduloStep, %obj);
+						}
+					}
+					// check to see if the brick has an event based custom sound
+					if ( %colA.customStep !$= "" ) 
+					{
+						%obj.touchColor = "";
+						%obj.surface = %colA.customStep;
+					}
+			}
+			else if ( %type $= "fxPlane" )
+			{
+				%obj.touchColor = "";
+					%obj.surface = parseSoundFromNumber($Pref::Server::PF::terrainStep, %obj);						
+			}
+			else if ( %type $= "WheeledVehicle" || %type $= "FlyingVehicle" )
+			{
+					%obj.touchColor = "";
+					%obj.surface = parseSoundFromNumber($Pref::Server::PF::vehicleStep, %obj);
+			}	
+			else
+			{
+					%obj.touchColor = "";
+					%obj.surface = parseSoundFromNumber($Pref::Server::PF::defaultStep, %obj);
+			}
+			if ( %obj.getWaterCoverage() > 0 )
+			{
+				%obj.surface = "water";
+				%obj.touchColor = "";
+			}
+			%isGround = true;
+		}
+		else
+		{	
+			%isGround = false;
+		}
+
+		%obj.isSlow = ( mAbs(getWord(%vel, 0)) < $Pref::Server::PF::runningMinSpeed && mAbs(getWord(%vel, 1)) < $Pref::Server::PF::runningMinSpeed || %obj.isCrouched() );
+		
+		if( %obj.getWaterCoverage() > 0 && $Pref::Server::PF::waterSFX == 1 && %obj.lastXY !$= %xyP && !%isGround )
+		{
+			%obj.touchColor = "";
+			%obj.surface = "under water";
+			%obj.lastXY = %xyP;
+			serverplay3d(checkPlayback(%obj), %obj.getHackPosition());
+			%obj.peggstep = schedule(500, 0, PeggFootsteps, %obj);
+		}
+		else if( %obj.lastXY $= %xyP || !%isGround )
+		{	
+			%obj.peggstep = schedule(50, 0, PeggFootsteps, %obj);	
+		}
+		else
+		{
+			%obj.lastXY = %xyP;
+			%obj.peggstep = schedule(320, 0, PeggFootsteps, %obj);
+			serverplay3d(checkPlayback(%obj), %obj.getHackPosition());
 		}
 		return;
 	}
-  %overwrite = false;
-	for ( %i = 0; %i < $Pref::Server::PF::customsounds; %i++ )
-  {
-    %hit = $Pref::Server::PF::colorPlaysFX[%i];
-    %hitcolor = getWords(%hit, 0, 3);
-    %hr = getWord(%hitcolor, 0);
-    %hg = getWord(%hitcolor, 1);
-    %hb = getWord(%hitcolor, 2);
-    %r = getWord(%color, 0);
-    %g = getWord(%color, 1);
-    %b = getWord(%color, 2);
-    if ( %hr == %r && %hg == %g && %hb == %b)
-    {
-      %hitsound = getWord(%hit, 4);
-      if ( %sound $= %hitsound ) 
-      {  
-        messageClient(%client,'',"\c6The sound, \c4" @ trim(%sound) @ "\c6, is already playing for <color:" @ %hex @ ">THIS COLOR\c6.");
-        return;
-      }
-      else
-      {
-        $Pref::Server::PF::colorPlaysFX[%i] = %color SPC %sound;
-        %overwrite = true;
-        break;
-      }
-    }
-  }
-  if ( ! %overwrite )
-  {
-    $Pref::Server::PF::colorPlaysFX[$Pref::Server::PF::customsounds] = %color SPC %sound;
-    $Pref::Server::PF::customsounds++;
-  }
-	messageClient(%client,'',"\c6The sound, \c4" @ trim(%sound) @ "\c6, now plays for <color:" @ %hex @ ">THIS COLOR\c6.");
+	%obj.peggstep = schedule(1000, 0, PeggFootsteps, %obj);
 }
 
-
+	
 //--------------------------------------------------------------------------------------
-// 		Server Preference Configuration:
+//		 Assigning custom sounds to specific bricks with events.
 //--------------------------------------------------------------------------------------
 
-//++-- If RTB is enabled:
+registerOutputEvent("fxDTSBrick","setFootstep","List Clear 0 Basic 1 Dirt 2 Grass 3 Metal 4 Sand 5 Snow 6 Stone 7 Water 8 Wood 9");
 
-//++ Register preferences:
-if(isFile("Add-Ons/SystemR_SoundeturnToBlockland/server.cs"))
+function fxDTSBrick::setFootstep(%brick, %val, %client)
 {
-	if(!$RTB::RTBR_ServerControl_Hook)
+	if ( !%val )
 	{
-		exec("Add-Ons/SystemR_SoundeturnToBlockland/RTBR_ServerControl_Hook.cs");
+		%brick.customStep = "";
 	}
-	RTB_RegisterPref("Enable Footstep SoundFX", "Peggy Footsteps", "$Pref::Server::PF::footstepsEnabled", "bool", "Script_PeggFootsteps", 1, 0, 0);
-	RTB_RegisterPref("Enable Special Metal SoundFX", "Peggy Footsteps", "$Pref::Server::PF::specialMetalSFX", "bool", "Script_PeggFootsteps", 1, 0, 0);
-	RTB_RegisterPref("Enable Swimming SoundFX", "Peggy Footsteps", "$Pref::Server::PF::waterSFX", "bool", "Script_PeggFootsteps", 1, 0, 0);
-	RTB_RegisterPref("Running Threshold", "Peggy Footsteps", "$Pref::Server::PF::runningMinSpeed", "float 0.1 50.0", "Script_PeggFootsteps", 2.8, 0, 0);
-}
-//++-- If RTB is disabled:
-else
-{
-	if ( $Pref::Server::PF::footstepsEnabled $= "" ) $Pref::Server::PF::footstepsEnabled = 1;
-	if ( $Pref::Server::PF::waterSFX $= "" ) $Pref::Server::PF::waterSFX = 1;
-	if ( $Pref::Server::PF::runningMinSpeed $= "" ) $Pref::Server::PF::runningMinSpeed = 2.8;
-	if ( $Pref::Server::PF::specialMetalSFX $= "" ) $Pref::Server::PF::specialMetalSFX = 1;
-}
-
-if ( $Pref::Server::PF::customsounds $= "" )
-{
-  $Pref::Server::PF::customsounds = 0;
+	else
+	{
+		%brick.customStep = parseSoundFromNumber(%val, %client.player);
+	}
 }

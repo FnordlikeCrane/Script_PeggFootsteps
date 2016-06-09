@@ -2,7 +2,6 @@
 //		Sound Datablocks:
 //--------------------------------------------------------------------------------------
 
-
 //++ Stone
 datablock AudioProfile(StepStone1R_Sound) { 	fileName = "./stone/STONER01.wav"; 	description = AudioClosest3d; 	preload = true; };
 datablock AudioProfile(StepStone2R_Sound) { 	fileName = "./stone/STONER02.wav"; 	description = AudioClosest3d; 	preload = true; };
@@ -193,3 +192,24 @@ datablock AudioProfile(StepMetal3W_Sound) { 	fileName = "./metal/metalW03.wav"; 
 $StepMetalW[%a++] = StepMetal1W_Sound;
 $StepMetalW[%a++] = StepMetal2W_Sound;
 $StepMetalW[%a++] = StepMetal3W_Sound;
+
+//++ basic
+datablock AudioProfile(StepBasic1R_Sound) { 	fileName = "./basic/sn_walk_conc_1.wav"; 	description = AudioClosest3d; 	preload = true; };
+datablock AudioProfile(StepBasic2R_Sound) { 	fileName = "./basic/sn_walk_conc_2.wav"; 	description = AudioClosest3d; 	preload = true; };
+datablock AudioProfile(StepBasic3R_Sound) { 	fileName = "./basic/sn_walk_conc_3.wav"; 	description = AudioClosest3d; 	preload = true; };
+datablock AudioProfile(StepBasic4R_Sound) { 	fileName = "./basic/sn_walk_conc_4.wav"; 	description = AudioClosest3d; 	preload = true; };
+%a = 0;
+$StepBasicR[%a++] = StepBasic1R_Sound;
+$StepBasicR[%a++] = StepBasic2R_Sound;
+$StepBasicR[%a++] = StepBasic3R_Sound;
+$StepBasicR[%a++] = StepBasic4R_Sound;
+
+datablock AudioProfile(StepBasic1W_Sound) { 	fileName = "./basic/walkQuiet1.wav"; 	description = AudioClosest3d; 	preload = true; };
+datablock AudioProfile(StepBasic2W_Sound) { 	fileName = "./basic/walkQuiet2.wav"; 	description = AudioClosest3d; 	preload = true; };
+datablock AudioProfile(StepBasic3W_Sound) { 	fileName = "./basic/walkQuiet3.wav"; 	description = AudioClosest3d; 	preload = true; };
+datablock AudioProfile(StepBasic4W_Sound) { 	fileName = "./basic/walkQuiet4.wav"; 	description = AudioClosest3d; 	preload = true; };
+%a = 0;
+$StepBasicW[%a++] = StepBasic1W_Sound;
+$StepBasicW[%a++] = StepBasic2W_Sound;
+$StepBasicW[%a++] = StepBasic3W_Sound;
+$StepBasicW[%a++] = StepBasic4W_Sound;
