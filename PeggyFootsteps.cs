@@ -94,6 +94,12 @@ function PeggFootsteps_getSound(%surface, %speed)
 			// snowsteps only have one speed. There is no walking sound effect for snowsteps
 			case "snow" :		
 				return $StepSnowR[getRandom(1,3)];
+				
+			default:
+				if ( %speed $= "walking" )
+					return $StepBasicW[getRandom(1,4)];
+				else
+					return $StepBasicR[getRandom(1,4)];
 		}
 }
 
@@ -162,22 +168,13 @@ function checkPlayback(%obj)
 //+++ Return the surface's name when given a number from a list.
 function parseSoundFromNumber(%val, %obj)
 {
+	if ( !$Pref::Server::PF::brickFXSounds::enabled ) return "default";
 	//Default 0 Basic 1 Dirt 2 Grass 3 Metal 4 Sand 5 Snow 6 Stone 7 Water 8 Wood 9
 	switch ( %val )
 	{
 		case 0:
-			if ( %obj == -1 )
-			{
-				return "by color";
-			}
-			else
-			{
-				if ( isObject(%obj.lastBrick) && getColorIDTable(%obj.lastBrick.getColorId()) !$= "" )
-				{
-					return "";
-				}
-				return parseSoundFromNumber($Pref::Server::PF::defaultStep, %obj);
-			}
+			if ( %obj.touchColor !$= "" ) return "color";
+			else return "default";
 		case 1:
 			return "basic";
 		case 2:
@@ -212,7 +209,7 @@ package peggsteps
 		%obj.isSlow = 0;
 		%obj.peggstep = schedule(50,0,PeggFootsteps,%obj);
 		return parent::onNewDatablock(%this, %obj);
-	}	
+	}		
 };
 activatepackage(peggsteps);
 
@@ -221,9 +218,32 @@ activatepackage(peggsteps);
 //		Footstep Playback:
 //--------------------------------------------------------------------------------------
 
+//+++ Landing from a fall
+function Armor::onLand(%data, %obj, %horiz)
+{
+	if ( !$Pref::Server::PF::landingFX ) return;
+	// The default speed at which to play a landing sound is 8.
+	// The current pref for speed + the default * 2 is when we play the heavy landing sound
+	// and current + default * 1 is when we play the medium landing sound, regardless of
+	// whatever the user's pref for landing speed is.
+	
+	if ( %horiz > $Pref::Server::PF::minLandSpeed + 16 ) // heavy landing sound
+	{
+		serverplay3d(LandHeavy_Sound, %obj.getHackPosition());
+	}
+	else if ( %horiz > $Pref::Server::PF::minLandSpeed + 8 ) // medium landing sound
+	{
+		serverplay3d($LandMedium[getRandom(1,3)], %obj.getHackPosition());
+	}
+	else if ( %horiz >= $Pref::Server::PF::minLandSpeed ) // lite landing sound
+	{
+		serverplay3d($LandLite[getRandom(1,3)], %obj.getHackPosition());
+	}
+}
+
 //+++ Drop some rad peggstep noise in here!
-function PeggFootsteps(%obj)
-{	
+function PeggFootsteps(%obj, %lastVert)
+{
 	cancel(%obj.peggstep);	
 	if($Pref::Server::PF::footstepsEnabled == 1 && isObject(%obj))
 	{	
@@ -233,81 +253,90 @@ function PeggFootsteps(%obj)
 			return;
 		}
 		//! Ripped from Hata's support_footstep.cs
-		%pos = %obj.getPosition();
-		%xyP = getWords(%pos,0,1);
 		%vel = %obj.getVelocity();
-		%posA = %obj.getPosition();
-		initContainerBoxSearch(%posA, "1.25 1.25 0.1", $TypeMasks::fxBrickObjectType | $Typemasks::TerrainObjectType | $TypeMasks::VehicleObjectType);
-		%colA = containerSearchNext();
-		%posB = vectorAdd(%posA,"0 0 0.5");
-		initContainerBoxSearch(%posB, "1.25 1.25 0.1", $TypeMasks::fxBrickObjectType | $Typemasks::TerrainObjectType | $TypeMasks::VehicleObjectType);
-		%colB = containerSearchNext();
+		%vert = getWord(%vel, 2);
+		%horiz = vectorLen(setWord(%vel, 2, 0));
+		
+		%pos = %obj.getPosition();
+		initContainerBoxSearch(%pos, "1.25 1.25 0.1", $TypeMasks::fxBrickObjectType | $Typemasks::TerrainObjectType | $TypeMasks::VehicleObjectType | $TypeMasks::FxPlaneObjectType);
+		%col = containerSearchNext();
 		//	echo(%type);
-		if( isObject(%colA) && %colA != %colB )
+		if( isObject(%col) )
 		{	
-			%type = %colA.getClassName();
-			if (  %type $= "fxDTSbrick" && %colA.isRendering() )
+			%type = %col.getClassName();
+			if (  %type $= "fxDTSbrick" && %col.isRendering() )
 			{
-					%obj.lastBrick =  %colA;
+					%obj.lastBrick =  %col;
 					// by default, the surface isn't decided yet, and will be decided by the color
-					%obj.touchColor = getColorIDTable(%colA.getColorId()); 		
+					%obj.touchColor = getColorIDTable(%col.getColorId()); 		
 					%obj.surface = "";
 					// check to see if there is a custom sound based on the brick's special FX
-					if ( $Pref::Server::PF::brickFXsounds::enabled )
+					if ( $Pref::Server::PF::brickFXSounds::enabled )
 					{
-						switch ( %colA.getColorFxID() )
+						// if there's a color fx
+						switch ( %col.getColorFxID() )
 						{
 							case 1:				
-								%obj.touchColor = "";
 								%obj.surface = parseSoundFromNumber($Pref::Server::PF::brickFXsounds::pearlStep, %obj);
+								%obj.touchColor = "";
 							case 2:				
-								%obj.touchColor = "";
 								%obj.surface = parseSoundFromNumber($Pref::Server::PF::brickFXsounds::chromeStep, %obj);
+								%obj.touchColor = "";
 							case 3:
-								%obj.touchColor = "";
 								%obj.surface = parseSoundFromNumber($Pref::Server::PF::brickFXsounds::glowStep, %obj);
+								%obj.touchColor = "";
 							case 4:	
-								%obj.touchColor = "";
 								%obj.surface = parseSoundFromNumber($Pref::Server::PF::brickFXsounds::blinkStep, %obj);
+								%obj.touchColor = "";
 							case 5:
-								%obj.touchColor = "";
 								%obj.surface = parseSoundFromNumber($Pref::Server::PF::brickFXsounds::swirlStep, %obj);
-							case 6:
 								%obj.touchColor = "";
+							case 6:
 								%obj.surface = parseSoundFromNumber($Pref::Server::PF::brickFXsounds::rainbowStep, %obj);
+								%obj.touchColor = "";
 						}
-						if ( %colA.getShapeFxID() )
+						// if there's a shape fx, which takes priority over color fx
+						if ( %col.getShapeFxID() )
 						{
-							%obj.touchColor = "";
 							%obj.surface = parseSoundFromNumber($Pref::Server::PF::brickFXsounds::unduloStep, %obj);
+							%obj.touchColor = "";
+						}
+						// if the preference for the shape or color fx is default, then just play the regular sound that would be made based on color
+						if ( %obj.surface $= "color" )
+						{
+							%obj.touchColor = getColorIDTable(%col.getColorId()); 		
 						}
 					}
 					// check to see if the brick has an event based custom sound
-					if ( %colA.customStep !$= "" ) 
+					if ( %col.customStep !$= "" ) 
 					{
 						%obj.touchColor = "";
-						%obj.surface = %colA.customStep;
+						%obj.surface = %col.customStep;
 					}
 			}
 			else if ( %type $= "fxPlane" )
 			{
 				%obj.touchColor = "";
-					%obj.surface = parseSoundFromNumber($Pref::Server::PF::terrainStep, %obj);						
+				%obj.surface = parseSoundFromNumber($Pref::Server::PF::terrainStep, %obj);						
 			}
 			else if ( %type $= "WheeledVehicle" || %type $= "FlyingVehicle" )
 			{
-					%obj.touchColor = "";
-					%obj.surface = parseSoundFromNumber($Pref::Server::PF::vehicleStep, %obj);
+				%obj.touchColor = "";
+				%obj.surface = parseSoundFromNumber($Pref::Server::PF::vehicleStep, %obj);
 			}	
 			else
 			{
-					%obj.touchColor = "";
-					%obj.surface = parseSoundFromNumber($Pref::Server::PF::defaultStep, %obj);
+				%obj.touchColor = "";
+				%obj.surface = parseSoundFromNumber($Pref::Server::PF::defaultStep, %obj);
 			}
 			if ( %obj.getWaterCoverage() > 0 )
 			{
 				%obj.surface = "water";
 				%obj.touchColor = "";
+			}
+			if ( !%isGround && mAbs(%lastVert) > $Pref::Server::PF::minLandSpeed * getWord(%obj.getScale(), 1) && $Pref::Server::PF::landingFX )
+			{
+				%obj.getDatablock().onLand(%obj, mAbs(%lastVert));
 			}
 			%isGround = true;
 		}
@@ -316,24 +345,22 @@ function PeggFootsteps(%obj)
 			%isGround = false;
 		}
 
-		%obj.isSlow = ( mAbs(getWord(%vel, 0)) < $Pref::Server::PF::runningMinSpeed && mAbs(getWord(%vel, 1)) < $Pref::Server::PF::runningMinSpeed || %obj.isCrouched() );
+		%obj.isSlow = ( mAbs(%horiz) < $Pref::Server::PF::runningMinSpeed * getWord(%obj.getScale(), 0) || %obj.isCrouched() );
 		
-		if( %obj.getWaterCoverage() > 0 && $Pref::Server::PF::waterSFX == 1 && %obj.lastXY !$= %xyP && !%isGround )
+		if( %obj.getWaterCoverage() > 0 && $Pref::Server::PF::waterSFX == 1 && mAbs(%horiz) > 0.1 && !%isGround )
 		{
 			%obj.touchColor = "";
 			%obj.surface = "under water";
-			%obj.lastXY = %xyP;
 			serverplay3d(checkPlayback(%obj), %obj.getHackPosition());
-			%obj.peggstep = schedule(500, 0, PeggFootsteps, %obj);
+			%obj.peggstep = schedule(500 * getWord(%obj.getScale(), 0), 0, PeggFootsteps, %obj);
 		}
-		else if( %obj.lastXY $= %xyP || !%isGround )
+		else if( %horiz == 0 || !%isGround )
 		{	
-			%obj.peggstep = schedule(50, 0, PeggFootsteps, %obj);	
+			%obj.peggstep = schedule(50, 0, PeggFootsteps, %obj, %vert);	
 		}
-		else
+		else if ( %isGround && mAbs(%horiz) > 0 )
 		{
-			%obj.lastXY = %xyP;
-			%obj.peggstep = schedule(320, 0, PeggFootsteps, %obj);
+			%obj.peggstep = schedule(320 * getWord(%obj.getScale(), 0), 0, PeggFootsteps, %obj, %vert);
 			serverplay3d(checkPlayback(%obj), %obj.getHackPosition());
 		}
 		return;

@@ -8,6 +8,7 @@
 //				We shall call them peggsteps and they will be the best.
 //-----------------------------------------------------------------------------------------------------------
 //	Version:  	
+//				3.1.0:  New more efficient method of detecting movement. Landing sound effects. Speed detection now scales to the size of the player, so being small won't make you constantly play the walking sound. Several bug fixes. Running sound effects are now AudioClose3d instead of AudioClosest3d for walking (making them heard from greater distances). [3/17/2017]
 //				3.0.0:	BrickFX now makes custom sounds via prefs, Customize specific brick soundFX with events, Enhanced Server Prefs, Customize non-brick soundFX, New 'basic' footsteps (Ripped from Hata's "Support_Footsteps") [5/26/2016]
 //				2.3.4:	Fixed error where certain commands would tell you to use '/help' not '/pegghelp' [2/20/2016] 
 //        		2.3.3:	Replaced '/help' with '/pegghelp' [12/29/2015]         
@@ -21,8 +22,10 @@
 //				1.1.0:	All sounds replaced with new ones, no new functionality	
 //				1.0.0:	Footsteps adapt to color of ground stepped on
 //-----------------------------------------------------------------------------------------------------------
-//  Thanks to Greek2Me for the 'rgbToHex' function, and to Hata for the framework to playing footsteps
-//	Thanks to Hata for having already made a footstep mod with good soundFX which I promptly stole
+//  Special Thanks:
+//  	Thanks to Greek2Me for the 'rgbToHex' function
+//		Thanks to Hata and Port for their footstep mods because I stole sound effects from each of theirs, as well as for releasing footstep add-ons that I learned from
+//		Thanks to those of you who downloaded my Add-On and actually liked it, because you've made me actually want to keep developing it
 //-----------------------------------------------------------------------------------------------------------
 
 
@@ -41,6 +44,8 @@ if(isFile("Add-Ons/SystemR_SoundeturnToBlockland/server.cs"))
 	}
 	RTB_RegisterPref("Enable Footstep SoundFX", "Peggy Footsteps", "$Pref::Server::PF::footstepsEnabled", "bool", "Script_PeggFootsteps", 1, 0, 0);
 	RTB_RegisterPref("BrickFX custom SoundFX", "Peggy Footsteps", "$Pref::Server::PF::brickFXSounds::enabled", "List	Default 0 Basic 1 Dirt 2 Grass 3 Metal 4 Sand 5 Snow 6 Stone 7 Water 8 Wood 9", "Script_PeggFootsteps", 0, 0, 0);
+	RTB_RegisterPref("Landing SoundFX", "Peggy Footsteps", "$Pref::Server::PF::landingFX", "List	Default 0 Basic 1 Dirt 2 Grass 3 Metal 4 Sand 5 Snow 6 Stone 7 Water 8 Wood 9", "Script_PeggFootsteps", 0, 0, 0);
+	RTB_RegisterPref("Landing Threshold", "Peggy Footsteps", "$Pref::Server::PF::minLandSpeed", "float 8.0 20.0", "Script_PeggFootsteps", 8.0, 0, 0);
 	RTB_RegisterPref("Running Threshold", "Peggy Footsteps", "$Pref::Server::PF::runningMinSpeed", "float 0.1 20.0", "Script_PeggFootsteps", 2.8, 0, 0);
 	RTB_RegisterPref("Enable Swimming SoundFX", "Peggy Footsteps", "$Pref::Server::PF::waterSFX", "bool", "Script_PeggFootsteps", 1, 0, 0);
 	RTB_RegisterPref("Default Step SoundFX", "Peggy Footsteps", "$Pref::Server::PF::defaultStep", "List	Basic 1 Dirt 2 Grass 3 Metal 4 Sand 5 Snow 6 Stone 7 Water 8 Wood 9", "Script_PeggFootsteps", 1, 0, 0);
@@ -48,16 +53,19 @@ if(isFile("Add-Ons/SystemR_SoundeturnToBlockland/server.cs"))
 	RTB_RegisterPref("Steps on Vehicles SoundFX", "Peggy Footsteps", "$Pref::Server::PF::vehicleStep", "List	Default 0 Basic 1 Dirt 2 Grass 3 Metal 4 Sand 5 Snow 6 Stone 7 Water 8 Wood 9", "Script_PeggFootsteps", 0, 0, 0);
 }
 
+
 //+++ If RTB is disabled:
 else
 {
 	if ( $Pref::Server::PF::footstepsEnabled $= "" ) $Pref::Server::PF::footstepsEnabled = 1;
+	if ( $Pref::Server::PF::brickFXSounds::enabled $= "" ) $Pref::Server::PF::brickFXSounds::enabled = 1;	
+	if ( $Pref::Server::PF::brickFXSounds::enabled $= "" ) $Pref::Server::PF::landingFX = 1;	
+	if ( $Pref::Server::PF::minLandSpeed $= "" ) $Pref::Server::PF::minLandSpeed = 8.0;
 	if ( $Pref::Server::PF::runningMinSpeed $= "" ) $Pref::Server::PF::runningMinSpeed = 2.8;
 	if ( $Pref::Server::PF::waterSFX $= "" ) $Pref::Server::PF::waterSFX = 1;
 	if ( $Pref::Server::PF::defaultStep $= "" ) $Pref::Server::PF::defaultStep = 1;	
 	if ( $Pref::Server::PF::terrainStep $= "" ) $Pref::Server::PF::terrainStep = 0;	
 	if ( $Pref::Server::PF::vehicleStep $= "" ) $Pref::Server::PF::vehicleStep = 0;	
-	if ( $Pref::Server::PF::brickFXSounds::enabled $= "" ) $Pref::Server::PF::brickFXSounds::enabled = 1;	
 }
 	if ( $Pref::Server::PF::brickFXsounds::pearlStep $= "" ) $Pref::Server::PF::pearlStep = 4;	
 	if ( $Pref::Server::PF::brickFXsounds::chromeStep $= "" ) $Pref::Server::PF::chromeStep = 4;	
@@ -66,7 +74,7 @@ else
 	if ( $Pref::Server::PF::brickFXsounds::swirlStep $= "" ) $Pref::Server::PF::brickFXsounds::swirlStep = 0;
 	if ( $Pref::Server::PF::brickFXsounds::rainbowStep $= "" ) $Pref::Server::PF::brickFXsounds::rainbowStep = 0;
 	if ( $Pref::Server::PF::brickFXsounds::unduloStep $= "" ) $Pref::Server::PF::unduloStep = 8;	
-
+	
 
 //+++ Execute everything
 exec("./Sounds/sounds.cs");

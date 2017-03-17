@@ -128,19 +128,33 @@ function servercmdToggle(%client, %toggle)
 		}
 		$Pref::Server::PF::footstepsEnabled = !$Pref::Server::PF::footstepsEnabled;
 	}
-	else if ( %toggle $= "BrickFXSounds" )
+	else if ( %toggle $= "BrickFX" )
 	{
-		if( !$Pref::Server::PF::brickFXSounds )
+		if( !$Pref::Server::PF::brickFXSounds::enabled )
 		{
 			messageClient(%client,'',"<color:00ff00>You have activated the brick FX custom sounds package.");
-			chatMessageAll('',"<color:ffffff>Footstep sound effects for brick special FX is now enabled.");
+			chatMessageAll('',"<color:ffffff>Footstep sound effects for brick special FX are now enabled.");
 		}
 		else
 		{
 			messageClient(%client,'',"<color:ff0000>You have de-activated the brick FX custom sounds package.");
-			chatMessageAll('',"<color:ff0000>Footstep sound effects for brick special FX is now disabled.");
+			chatMessageAll('',"<color:ff0000>Footstep sound effects for brick special FX are now disabled.");
 		}
-		$Pref::Server::PF::brickFXSounds = !$Pref::Server::PF::brickFXSounds; 
+		$Pref::Server::PF::brickFXSounds::enabled = !$Pref::Server::PF::brickFXSounds::enabled; 
+	}
+	else if ( %toggle $= "LandingFX" )
+	{
+		if( !$Pref::Server::PF::landingFX )
+		{
+			messageClient(%client,'',"<color:00ff00>You have activated the landing FX custom sounds package.");
+			chatMessageAll('',"<color:ffffff>Footstep sound effects for landing after falling are now enabled.");
+		}
+		else
+		{
+			messageClient(%client,'',"<color:ff0000>You have de-activated the landing FX custom sounds package.");
+			chatMessageAll('',"<color:ff0000>Footstep sound effects for landing after falling are now disabled.");
+		}
+		$Pref::Server::PF::landingFX = !$Pref::Server::PF::landingFX; 	
 	}
 	else
 	{
@@ -179,16 +193,42 @@ function servercmdSetMinRunSpeed(%client, %value)
 	}
 }
 
+//+++ Landing Speed:
+function servercmdSetMinLandSpeed(%client, %value)
+{
+	if(!%client.isAdmin && !%client.isSuperAdmin)
+	{	
+		messageClient(%client,'',"<color:ff0000>You dingus!<color:ffff00> Narry a man, save admin or super admin, hath the divine power to do hither command!");
+	}
+	else
+	{	
+		if(%value > 20.0)
+		{
+			messageClient(%client,'',"<color:ffffff>That value is too high to use as the minimum running speed.");
+			return;
+		}
+		if(%value < 8.0)
+		{
+			messageClient(%client,'',"<color:ffffff>That value is too low to use as the minimum runnings speed.");
+			return;
+		}
+		$Pref::Server::PF::minLandSpeed = %value;
+		messageClient(%client,'',"<color:ffffff>You have now set the minimum landing speed to " @ %value @ ". Gowing below this speed will not play a sound at all when you land.");
+	}
+}
+
 //+++ Basic help command
-function servercmdpegghelp(%client)
+function serverCmdPeggHelp(%client)
 {
 	messageClient(%client,'',"\c6The following is a list of admin commands for the \c3Peggy Footsteps\c6 add-on:");
 	messageClient(%client,'',"\c6/toggle Footsteps");
 	messageClient(%client,'',"\c6/toggle SwimmingFX");
-	messageClient(%client,'',"\c6/toggle BrickFXSounds");
-	messageClient(%client,'',"\c6/getPeggstepPrefs");
+	messageClient(%client,'',"\c6/toggle BrickFX");
+	messageClient(%client,'',"\c6/toggle LandingFX");
+	messageClient(%client,'',"\c6/getPeggPrefs");
 	messageClient(%client,'',"\c6/getCustomSounds");
 	messageClient(%client,'',"\c6/setMinRunSpeed \c0<\c3decimal value\c0>\c6");
+	messageClient(%client,'',"\c6/setMinLandSpeed \c0<\c3decimal value\c0>\c6");
 	messageClient(%client,'',"\c6/setColorToFootstep \c0<\c3sound\c0> <color:dddddd>(This command will set the current color you have selected on your paint selector to play a sound you select.)");
 	messageClient(%client,'',"\c6/clearCustomSound <color:dddddd>(This command will remove the SFX for the CURRENT color selected on your paint selector.)");
 	messageClient(%client,'',"\c6/clearCustomSounds <color:dddddd>(This command will remove the custom SFX for ALL colors.)");
@@ -197,7 +237,7 @@ function servercmdpegghelp(%client)
 }
 
 //+++ Get all of the current preferences for PeggyFootsteps
-function servercmdGetPeggstepPrefs(%client)
+function servercmdGetPeggPrefs(%client)
 {
 	if(!%client.isAdmin && !%client.isSuperAdmin)
 	{	
@@ -207,11 +247,13 @@ function servercmdGetPeggstepPrefs(%client)
 	messageClient(%client,'',"\c6The following is a list of preferences for the \c3Peggy Footsteps\c6 add-on:");
 	messageClient(%client,'',"<color:ffffff>Footsteps Enabled: " @ ($Pref::Server::PF::footstepsEnabled ? "<color:00ff00>enabled" : "<color:ff0000>disabled"));
 	messageClient(%client,'',"<color:ffffff>Swimming SoundFX: " @ ($Pref::Server::PF::waterSFX ? "<color:00ff00>enabled" : "<color:ff0000>disabled"));
+	messageClient(%client,'',"<color:ffffff>Special BrickFX make custom SoundFX: " @ ($Pref::Server::PF::brickFXSounds::enabled ? "<color:00ff00>enabled" : "<color:ff0000>disabled"));
+	messageClient(%client,'',"<color:ffffff>Landing SoundFX: " @ ($Pref::Server::PF::landingFX ? "<color:00ff00>enabled" : "<color:ff0000>disabled"));
+	if ( $Pref::Server::PF::landingFX ) messageClient(%client,'',"<color:ffffff>Landing SoundFX Minimum Speed: <color:ffff00>" @ $Pref::Server::PF::minLandSpeed);
 	messageClient(%client,'',"<color:ffffff>Running Minimum Speed: <color:ffff00>" @ $Pref::Server::PF::runningMinSpeed);
 	messageClient(%client,'',"<color:ffffff>Default Footstep SFX: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::defaultStep, -1) );		 
 	messageClient(%client,'',"<color:ffffff>Terrain Footsteps: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::terrainStep, -1) );		 
 	messageClient(%client,'',"<color:ffffff>Vehicle Footsteps: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::vehicleStep, -1) );		 
-	messageClient(%client,'',"<color:ffffff>Special BrickFX make custom SoundFX: " @ ($Pref::Server::PF::brickFXSounds::enabled ? "<color:00ff00>enabled" : "<color:ff0000>disabled"));
 	if ( $Pref::Server::PF::brickFXSounds::enabled )
 	{
 		messageClient(%client,'',"<color:ffffff>Pearl SoundFX: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::brickFXsounds::pearlStep, -1) );		 
@@ -231,7 +273,7 @@ function servercmdGetPeggstepPrefs(%client)
 //--------------------------------------------------------------------------------------
 
 //+++ Clear the custom list.
-function servercmdClearCustomSounds(%client)
+function serverCmdClearCustomSounds(%client)
 {
 	if( !%client.isAdmin )
 	{	
@@ -247,7 +289,7 @@ function servercmdClearCustomSounds(%client)
 }
 
 //+++ Clear a single entry on the custom list
-function servercmdClearCustomSound(%client)
+function serverCmdClearCustomSound(%client)
 {
 	if( !%client.isAdmin )
 	{	
