@@ -38,63 +38,63 @@ function rgbToHex(%rgb) //! Ripped from Greek2Me's SLAYER
 function PeggFootsteps_getSound(%surface, %speed)
 {
 		switch$ ( %surface )
-		{	
+		{
 			// swimmingfx only has one speed. There is no walking speed for swimmingfx.
-			case "under water":   
+			case "under water":
 				return $StepSwimming[getRandom(1,6)];
-			
+
 			case "metal":
 				if ( %speed $= "walking" )
 					return $StepMetalW[getRandom(1,3)];
 				else
 					return $StepMetalR[getRandom(1,3)];
-			
+
 			case "dirt":
 				if ( %speed $= "walking" )
 					return $StepDirtW[getRandom(1,4)];
 				else
 					return $StepDirtR[getRandom(1,6)];
-		
+
 			case "grass":
 				if ( %speed $= "walking" )
 					return $StepGrassW[getRandom(1,4)];
 				else
 					return $StepGrassR[getRandom(1,6)];
-		
+
 			case "stone":
 				if ( %speed $= "walking" )
 					return $StepStoneW[getRandom(1,4)];
 				else
 					return $StepStoneR[getRandom(1,6)];
-		
+
 			case "water":
 				if ( %speed $= "walking" )
 					return $StepWaterW[getRandom(1,4)];
 				else
 					return $StepWaterR[getRandom(1,6)];
-		
+
 			case "wood":
 				if ( %speed $= "walking" )
 					return $StepWoodW[getRandom(1,4)];
 				else
 					return $StepWoodR[getRandom(1,6)];
-			
+
 			case "sand":
 				if ( %speed $= "walking" )
 					return $StepSandW[getRandom(1,4)];
 				else
 					return $StepSandR[getRandom(1,6)];
-			
+
 			case "basic":
 				if ( %speed $= "walking" )
 					return $StepBasicW[getRandom(1,4)];
 				else
 					return $StepBasicR[getRandom(1,4)];
-			
+
 			// snowsteps only have one speed. There is no walking sound effect for snowsteps
-			case "snow" :		
+			case "snow" :
 				return $StepSnowR[getRandom(1,3)];
-				
+
 			default:
 				if ( %speed $= "walking" )
 					return $StepBasicW[getRandom(1,4)];
@@ -105,12 +105,12 @@ function PeggFootsteps_getSound(%surface, %speed)
 
 //+++ 	Calculate the noise based off what the player is stepping on.
 function checkPlayback(%obj)
-{	
+{
 	%surface = ( %obj.touchcolor $= "" ) ? %obj.surface : %obj.touchColor;
 	%speed = ( %obj.isSlow == 0 ) ? "running" : "walking";
-	
+
 	if ( %obj.touchColor $= "" )
-	{		
+	{
 		return PeggFootsteps_getSound(%surface, %speed);
 	}
 	else
@@ -118,7 +118,7 @@ function checkPlayback(%obj)
 		%r = getWord(%surface, 0) * 255;
 		%g = getWord(%surface, 1) * 255;
 		%b = getWord(%surface, 2) * 255;
-		
+
 		for ( %i = 0; %i < $Pref::Server::PF::customsounds; %i++ )
 		{
 			%hit = $Pref::Server::PF::colorPlaysFX[%i];
@@ -136,24 +136,24 @@ function checkPlayback(%obj)
 		if (%r >= %b && %b >= %g || (%r > 180 && %g > 180))
 		{
 			%surface = "dirt";
-		}	
+		}
 		else if (%r >= %g && %g > %b)
 		{
 			%surface = "wood";
 		}
 		else if (%g >= %b && %g > %r)
-		{	
+		{
 			%surface = "grass";
 		}
 		else
-		{	
+		{
 			%surface = "stone";
 		}
 		if (%r == %b && %r == %g && %b == %g)
-		{	
+		{
 			%surface = "stone";
 			if(%r > 230 && %g > 230 && %b > 230)
-			{	
+			{
 				%surface = "snow";
 			}
 		}
@@ -199,7 +199,7 @@ function parseSoundFromNumber(%val, %obj)
 //+++ When any lifeform spawns, create a footstep loop.
 deactivatepackage(peggsteps);
 package peggsteps
-{	
+{
 	function Armor::onNewDatablock(%this, %obj)
 	{
 		// creatures like horses won't make footsteps, but other AI will
@@ -209,7 +209,7 @@ package peggsteps
 		%obj.isSlow = 0;
 		%obj.peggstep = schedule(50,0,PeggFootsteps,%obj);
 		return parent::onNewDatablock(%this, %obj);
-	}		
+	}
 };
 activatepackage(peggsteps);
 
@@ -226,7 +226,7 @@ function Armor::onLand(%data, %obj, %horiz)
 	// The current pref for speed + the default * 2 is when we play the heavy landing sound
 	// and current + default * 1 is when we play the medium landing sound, regardless of
 	// whatever the user's pref for landing speed is.
-	
+
 	if ( %horiz > $Pref::Server::PF::minLandSpeed + 16 ) // heavy landing sound
 	{
 		serverplay3d(LandHeavy_Sound, %obj.getHackPosition());
@@ -244,9 +244,9 @@ function Armor::onLand(%data, %obj, %horiz)
 //+++ Drop some rad peggstep noise in here!
 function PeggFootsteps(%obj, %lastVert)
 {
-	cancel(%obj.peggstep);	
+	cancel(%obj.peggstep);
 	if($Pref::Server::PF::footstepsEnabled == 1 && isObject(%obj))
-	{	
+	{
 		if ( %obj.isMounted() )
 		{
 			%obj.peggstep = schedule(50,0,PeggFootsteps,%obj);
@@ -256,19 +256,19 @@ function PeggFootsteps(%obj, %lastVert)
 		%vel = %obj.getVelocity();
 		%vert = getWord(%vel, 2);
 		%horiz = vectorLen(setWord(%vel, 2, 0));
-		
+
 		%pos = %obj.getPosition();
 		initContainerBoxSearch(%pos, "1.25 1.25 0.1", $TypeMasks::fxBrickObjectType | $Typemasks::TerrainObjectType | $TypeMasks::VehicleObjectType | $TypeMasks::FxPlaneObjectType);
 		%col = containerSearchNext();
 		//	echo(%type);
 		if( isObject(%col) )
-		{	
+		{
 			%type = %col.getClassName();
 			if (  %type $= "fxDTSbrick" && %col.isRendering() )
 			{
 					%obj.lastBrick =  %col;
 					// by default, the surface isn't decided yet, and will be decided by the color
-					%obj.touchColor = getColorIDTable(%col.getColorId()); 		
+					%obj.touchColor = getColorIDTable(%col.getColorId());
 					%obj.surface = "";
 					// check to see if there is a custom sound based on the brick's special FX
 					if ( $Pref::Server::PF::brickFXSounds::enabled )
@@ -276,16 +276,16 @@ function PeggFootsteps(%obj, %lastVert)
 						// if there's a color fx
 						switch ( %col.getColorFxID() )
 						{
-							case 1:				
+							case 1:
 								%obj.surface = parseSoundFromNumber($Pref::Server::PF::brickFXsounds::pearlStep, %obj);
 								%obj.touchColor = "";
-							case 2:				
+							case 2:
 								%obj.surface = parseSoundFromNumber($Pref::Server::PF::brickFXsounds::chromeStep, %obj);
 								%obj.touchColor = "";
 							case 3:
 								%obj.surface = parseSoundFromNumber($Pref::Server::PF::brickFXsounds::glowStep, %obj);
 								%obj.touchColor = "";
-							case 4:	
+							case 4:
 								%obj.surface = parseSoundFromNumber($Pref::Server::PF::brickFXsounds::blinkStep, %obj);
 								%obj.touchColor = "";
 							case 5:
@@ -304,11 +304,11 @@ function PeggFootsteps(%obj, %lastVert)
 						// if the preference for the shape or color fx is default, then just play the regular sound that would be made based on color
 						if ( %obj.surface $= "color" )
 						{
-							%obj.touchColor = getColorIDTable(%col.getColorId()); 		
+							%obj.touchColor = getColorIDTable(%col.getColorId());
 						}
 					}
 					// check to see if the brick has an event based custom sound
-					if ( %col.customStep !$= "" ) 
+					if ( %col.customStep !$= "" )
 					{
 						%obj.touchColor = "";
 						%obj.surface = %col.customStep;
@@ -317,13 +317,13 @@ function PeggFootsteps(%obj, %lastVert)
 			else if ( %type $= "fxPlane" )
 			{
 				%obj.touchColor = "";
-				%obj.surface = parseSoundFromNumber($Pref::Server::PF::terrainStep, %obj);						
+				%obj.surface = parseSoundFromNumber($Pref::Server::PF::terrainStep, %obj);
 			}
 			else if ( %type $= "WheeledVehicle" || %type $= "FlyingVehicle" )
 			{
 				%obj.touchColor = "";
 				%obj.surface = parseSoundFromNumber($Pref::Server::PF::vehicleStep, %obj);
-			}	
+			}
 			else
 			{
 				%obj.touchColor = "";
@@ -341,12 +341,12 @@ function PeggFootsteps(%obj, %lastVert)
 			%isGround = true;
 		}
 		else
-		{	
+		{
 			%isGround = false;
 		}
 
 		%obj.isSlow = ( mAbs(%horiz) < $Pref::Server::PF::runningMinSpeed * getWord(%obj.getScale(), 0) || %obj.isCrouched() );
-		
+
 		if( %obj.getWaterCoverage() > 0 && $Pref::Server::PF::waterSFX == 1 && mAbs(%horiz) > 0.1 && !%isGround )
 		{
 			%obj.touchColor = "";
@@ -355,8 +355,8 @@ function PeggFootsteps(%obj, %lastVert)
 			%obj.peggstep = schedule(500 * getWord(%obj.getScale(), 0), 0, PeggFootsteps, %obj);
 		}
 		else if( %horiz == 0 || !%isGround )
-		{	
-			%obj.peggstep = schedule(50, 0, PeggFootsteps, %obj, %vert);	
+		{
+			%obj.peggstep = schedule(50, 0, PeggFootsteps, %obj, %vert);
 		}
 		else if ( %isGround && mAbs(%horiz) > 0 )
 		{
@@ -368,7 +368,7 @@ function PeggFootsteps(%obj, %lastVert)
 	%obj.peggstep = schedule(1000, 0, PeggFootsteps, %obj);
 }
 
-	
+
 //--------------------------------------------------------------------------------------
 //		 Assigning custom sounds to specific bricks with events.
 //--------------------------------------------------------------------------------------

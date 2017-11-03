@@ -8,6 +8,7 @@
 //				We shall call them peggsteps and they will be the best.
 //-----------------------------------------------------------------------------------------------------------
 //	Version:
+//        3.1.1A: RTB / Glass Prefs fixed (for real) [11/3/2017]
 //				3.1.1:  RTB / Glass Prefs fixed [11/2/2017]
 //				3.1.0:  New more efficient method of detecting movement. Landing sound effects. Speed detection now scales to the size of the player, so being small won't make you constantly play the walking sound. Several bug fixes. Running sound effects are now AudioClose3d instead of AudioClosest3d for walking (making them heard from greater distances). [3/17/2017]
 //				3.0.0:	BrickFX now makes custom sounds via prefs, Customize specific brick soundFX with events, Enhanced Server Prefs, Customize non-brick soundFX, New 'basic' footsteps (Ripped from Hata's "Support_Footsteps") [5/26/2016]
@@ -34,7 +35,7 @@
 // 		Server Preference Configuration:
 //--------------------------------------------------------------------------------------
 
-//+++ If RTB is enabled:
+//+++ If RTB or BLG is available:
 
 //++ Register preferences:
 if( isFile("Add-Ons/System_ReturnToBlockland/server.cs") || isFile("Add-Ons/System_BlocklandGlass/server.cs") )
@@ -44,11 +45,11 @@ if( isFile("Add-Ons/System_ReturnToBlockland/server.cs") || isFile("Add-Ons/Syst
 		exec("Add-Ons/System_ReturnToBlockland/RTBR_ServerControl_Hook.cs");
 	}
 	RTB_RegisterPref("Enable Footstep SoundFX", "Peggy Footsteps", "$Pref::Server::PF::footstepsEnabled", "bool", "Script_PeggFootsteps", 1, 0, 0);
-	RTB_RegisterPref("BrickFX custom SoundFX", "Peggy Footsteps", "$Pref::Server::PF::brickFXSounds::enabled", "List	Default 0 Basic 1 Dirt 2 Grass 3 Metal 4 Sand 5 Snow 6 Stone 7 Water 8 Wood 9", "Script_PeggFootsteps", 0, 0, 0);
+	RTB_RegisterPref("BrickFX custom SoundFX", "Peggy Footsteps", "$Pref::Server::PF::brickFXSounds::enabled", "bool", 1, 0, 0);
 	RTB_RegisterPref("Enable Landing SoundFX", "Peggy Footsteps", "$Pref::Server::PF::landingFX", "bool", "Script_PeggFootsteps", 1, 0, 0);
-	RTB_RegisterPref("Landing Threshold", "Peggy Footsteps", "$Pref::Server::PF::minLandSpeed", "float 8.0 20.0", "Script_PeggFootsteps", 8.0, 0, 0);
-	RTB_RegisterPref("Running Threshold", "Peggy Footsteps", "$Pref::Server::PF::runningMinSpeed", "float 0.1 20.0", "Script_PeggFootsteps", 2.8, 0, 0);
-	RTB_RegisterPref("Enable Swimming SoundFX", "Peggy Footsteps", "$Pref::Server::PF::waterSFX", "bool", "Script_PeggFootsteps", 1, 0, 0);
+  RTB_RegisterPref("Enable Swimming SoundFX", "Peggy Footsteps", "$Pref::Server::PF::waterSFX", "bool", "Script_PeggFootsteps", 1, 0, 0);
+	RTB_RegisterPref("Landing Threshold", "Peggy Footsteps", "$Pref::Server::PF::minLandSpeed", "int 0.0 20.0", "Script_PeggFootsteps", 10.0, 0, 0);
+	RTB_RegisterPref("Running Threshold", "Peggy Footsteps", "$Pref::Server::PF::runningMinSpeed", "int 0.0 20.0", "Script_PeggFootsteps", 2.8, 0, 0);
 	RTB_RegisterPref("Default Step SoundFX", "Peggy Footsteps", "$Pref::Server::PF::defaultStep", "List	Basic 1 Dirt 2 Grass 3 Metal 4 Sand 5 Snow 6 Stone 7 Water 8 Wood 9", "Script_PeggFootsteps", 1, 0, 0);
 	RTB_RegisterPref("Steps on Terrain SoundFX", "Peggy Footsteps", "$Pref::Server::PF::terrainStep", "List	Default 0 Basic 1 Dirt 2 Grass 3 Metal 4 Sand 5 Snow 6 Stone 7 Water 8 Wood 9", "Script_PeggFootsteps", 0, 0, 0);
 	RTB_RegisterPref("Steps on Vehicles SoundFX", "Peggy Footsteps", "$Pref::Server::PF::vehicleStep", "List	Default 0 Basic 1 Dirt 2 Grass 3 Metal 4 Sand 5 Snow 6 Stone 7 Water 8 Wood 9", "Script_PeggFootsteps", 0, 0, 0);
