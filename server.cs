@@ -45,7 +45,7 @@ if( isFile("Add-Ons/System_ReturnToBlockland/server.cs") || isFile("Add-Ons/Syst
 		exec("Add-Ons/System_ReturnToBlockland/RTBR_ServerControl_Hook.cs");
 	}
 	RTB_RegisterPref("Enable Footstep SoundFX", "Peggy Footsteps", "$Pref::Server::PF::footstepsEnabled", "bool", "Script_PeggFootsteps", 1, 0, 0);
-	RTB_RegisterPref("BrickFX custom SoundFX", "Peggy Footsteps", "$Pref::Server::PF::brickFXSounds::enabled", "bool", 1, 0, 0);
+	RTB_RegisterPref("BrickFX custom SoundFX", "Peggy Footsteps", "$Pref::Server::PF::brickFXSounds::enabled", "bool", "Script_PeggFootsteps", 1, 0, 0);
 	RTB_RegisterPref("Enable Landing SoundFX", "Peggy Footsteps", "$Pref::Server::PF::landingFX", "bool", "Script_PeggFootsteps", 1, 0, 0);
   RTB_RegisterPref("Enable Swimming SoundFX", "Peggy Footsteps", "$Pref::Server::PF::waterSFX", "bool", "Script_PeggFootsteps", 1, 0, 0);
 	RTB_RegisterPref("Landing Threshold", "Peggy Footsteps", "$Pref::Server::PF::minLandSpeed", "int 0.0 20.0", "Script_PeggFootsteps", 10.0, 0, 0);
