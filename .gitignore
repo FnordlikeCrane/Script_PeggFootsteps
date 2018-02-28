@@ -46,4 +46,10 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# We dont' want to share these
+
+# =========================
+# Custom
+# =========================
+
+.wav
+*.wav
