@@ -8,6 +8,7 @@
 //				We shall call them peggsteps and they will be the best.
 //-----------------------------------------------------------------------------------------------------------
 //	Version:
+//				3.1.1B:	Bug fix, Standing on a ramp no longer continuously plays SoundFX [4/18/2018]
 //        3.1.1A: RTB / Glass Prefs fixed (for real) [11/3/2017]
 //				3.1.1:  RTB / Glass Prefs fixed [11/2/2017]
 //				3.1.0:  New more efficient method of detecting movement. Landing sound effects. Speed detection now scales to the size of the player, so being small won't make you constantly play the walking sound. Several bug fixes. Running sound effects are now AudioClose3d instead of AudioClosest3d for walking (making them heard from greater distances). [3/17/2017]

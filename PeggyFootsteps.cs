@@ -264,7 +264,7 @@ function PeggFootsteps(%obj, %lastVert)
 		if( isObject(%col) )
 		{
 			%type = %col.getClassName();
-			if (  %type $= "fxDTSbrick" && %col.isRendering() )
+			if ( %type $= "fxDTSbrick" && %col.isRendering() )
 			{
 					%obj.lastBrick =  %col;
 					// by default, the surface isn't decided yet, and will be decided by the color
@@ -354,7 +354,7 @@ function PeggFootsteps(%obj, %lastVert)
 			serverplay3d(checkPlayback(%obj), %obj.getHackPosition());
 			%obj.peggstep = schedule(500 * getWord(%obj.getScale(), 0), 0, PeggFootsteps, %obj);
 		}
-		else if( %horiz == 0 || !%isGround )
+		else if( mFloor(%horiz) == 0 || !%isGround )
 		{
 			%obj.peggstep = schedule(50, 0, PeggFootsteps, %obj, %vert);
 		}
