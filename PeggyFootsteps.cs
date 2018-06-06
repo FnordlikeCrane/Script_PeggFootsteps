@@ -37,6 +37,7 @@ function rgbToHex(%rgb) //! Ripped from Greek2Me's SLAYER
 //+++	Return the sound datablock based off the surface.
 function PeggFootsteps_getSound(%surface, %speed)
 {
+		//echo(%surface);
 		switch$ ( %surface )
 		{
 			// swimmingfx only has one speed. There is no walking speed for swimmingfx.
@@ -92,8 +93,11 @@ function PeggFootsteps_getSound(%surface, %speed)
 					return $StepBasicR[getRandom(1,4)];
 
 			// snowsteps only have one speed. There is no walking sound effect for snowsteps
-			case "snow" :
+			case "snow":
 				return $StepSnowR[getRandom(1,3)];
+
+			case "default":
+				return PeggFootsteps_getSound(parseSoundFromNumber($Pref::Server::PF::defaultStep, 0), %speed);
 
 			default:
 				if ( %speed $= "walking" )
@@ -166,7 +170,7 @@ function checkPlayback(%obj)
 }
 
 //+++ Return the surface's name when given a number from a list.
-function parseSoundFromNumber(%val, %obj)
+function parseSoundFromNumber(%val, %obj) // brick is an optional parameter
 {
 	if ( !$Pref::Server::PF::brickFXSounds::enabled ) return "default";
 	//Default 0 Basic 1 Dirt 2 Grass 3 Metal 4 Sand 5 Snow 6 Stone 7 Water 8 Wood 9
@@ -210,6 +214,13 @@ package peggsteps
 		%obj.peggstep = schedule(50,0,PeggFootsteps,%obj);
 		return parent::onNewDatablock(%this, %obj);
 	}
+
+	function onMissionEnded(%this, %a, %b, %c, %d)
+	{
+		$PFGlassInit = false;
+		return parent::onMissionEnded(%this, %a, %b, %c, %d);
+	}
+
 };
 activatepackage(peggsteps);
 
@@ -373,16 +384,17 @@ function PeggFootsteps(%obj, %lastVert)
 //		 Assigning custom sounds to specific bricks with events.
 //--------------------------------------------------------------------------------------
 
-registerOutputEvent("fxDTSBrick","setFootstep","List Clear 0 Basic 1 Dirt 2 Grass 3 Metal 4 Sand 5 Snow 6 Stone 7 Water 8 Wood 9");
+registerOutputEvent("fxDTSBrick","setFootstep","List Clear -1 Default 0 Basic 1 Dirt 2 Grass 3 Metal 4 Sand 5 Snow 6 Stone 7 Water 8 Wood 9");
 
 function fxDTSBrick::setFootstep(%brick, %val, %client)
 {
-	if ( !%val )
+	if ( %val == -1 )
 	{
 		%brick.customStep = "";
 	}
 	else
 	{
 		%brick.customStep = parseSoundFromNumber(%val, %client.player);
+		//echo(%brick.customStep);
 	}
 }

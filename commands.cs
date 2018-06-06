@@ -35,7 +35,7 @@ function servercmdSetFootstep(%client, %type, %sound)
 	for ( %a=0; %a <= %j; %a++ )
 	{
 		if( trim(%sound)$= %sounds[%a] )
-		{	
+		{
 			%match = true;
 			%hit = %a;
 			break;
@@ -54,11 +54,11 @@ function servercmdSetFootstep(%client, %type, %sound)
 	{
 		case "pearl":
 			$Pref::Server::PF::brickFXsounds::pearlStep = %hit;
-		case "chrome": 
+		case "chrome":
 			$Pref::Server::PF::brickFXsounds::chromeStep = %hit;
-		case "glow": 
+		case "glow":
 			$Pref::Server::PF::brickFXsounds::glowStep = %hit;
-		case "blink": 
+		case "blink":
 			$Pref::Server::PF::brickFXsounds::blinkStep = %hit;
 		case "swirl":
 			$Pref::Server::PF::brickFXsounds::swirlStep = %hit;
@@ -67,14 +67,14 @@ function servercmdSetFootstep(%client, %type, %sound)
 		case "undulo":
 			$Pref::Server::PF::brickFXsounds::unduloStep = %hit;
 		case "default":
-			if ( %hit == 0 ) 
+			if ( %hit == 0 )
 			{
 				for ( %a=1; %a <= %j; %a++ )
 				{
 					messageClient(%client, '', "\c5 - " @ %sounds[%a]);
 				}
 				messageClient(%client,'',"\c0The default sound can't be set to itself, choose another sound.\c6 The sounds you can choose are listed above. <color:aaaaaa>(PgUp to see all options)");
-				return;				
+				return;
 			}
 			$Pref::Server::PF::defaultStep = %hit;
 		case "terrain":
@@ -96,11 +96,11 @@ function servercmdSetFootstep(%client, %type, %sound)
 function servercmdToggle(%client, %toggle)
 {
 	if( !%client.isAdmin )
-	{	
+	{
 		messageClient(%client,'',"<color:ff0000>You dingus!<color:ffff00> Narry a man, save admin or super admin, hath the divine power to do hither command!");
 	}
 	else if ( %toggle $= "SwimmingFX" )
-	{	
+	{
 		if( !$Pref::Server::PF::waterSFX )
 		{
 			messageClient(%client,'',"<color:00ff00>You have activated the swimming SFX package.");
@@ -115,7 +115,7 @@ function servercmdToggle(%client, %toggle)
 		}
 	}
 	else if ( %toggle $= "footsteps" )
-	{	
+	{
 		if( !$Pref::Server::PF::footstepsEnabled )
 		{
 			messageClient(%client,'',"<color:00ff00>You have activated the footstep SFX package.");
@@ -140,7 +140,7 @@ function servercmdToggle(%client, %toggle)
 			messageClient(%client,'',"<color:ff0000>You have de-activated the brick FX custom sounds package.");
 			chatMessageAll('',"<color:ff0000>Footstep sound effects for brick special FX are now disabled.");
 		}
-		$Pref::Server::PF::brickFXSounds::enabled = !$Pref::Server::PF::brickFXSounds::enabled; 
+		$Pref::Server::PF::brickFXSounds::enabled = !$Pref::Server::PF::brickFXSounds::enabled;
 	}
 	else if ( %toggle $= "LandingFX" )
 	{
@@ -154,7 +154,7 @@ function servercmdToggle(%client, %toggle)
 			messageClient(%client,'',"<color:ff0000>You have de-activated the landing FX custom sounds package.");
 			chatMessageAll('',"<color:ff0000>Footstep sound effects for landing after falling are now disabled.");
 		}
-		$Pref::Server::PF::landingFX = !$Pref::Server::PF::landingFX; 	
+		$Pref::Server::PF::landingFX = !$Pref::Server::PF::landingFX;
 	}
 	else
 	{
@@ -173,11 +173,11 @@ function servercmdToggle(%client, %toggle)
 function servercmdSetMinRunSpeed(%client, %value)
 {
 	if(!%client.isAdmin && !%client.isSuperAdmin)
-	{	
+	{
 		messageClient(%client,'',"<color:ff0000>You dingus!<color:ffff00> Narry a man, save admin or super admin, hath the divine power to do hither command!");
 	}
 	else
-	{	
+	{
 		if(%value > 20.0)
 		{
 			messageClient(%client,'',"<color:ffffff>That value is too high to use as the minimum running speed.");
@@ -197,11 +197,11 @@ function servercmdSetMinRunSpeed(%client, %value)
 function servercmdSetMinLandSpeed(%client, %value)
 {
 	if(!%client.isAdmin && !%client.isSuperAdmin)
-	{	
+	{
 		messageClient(%client,'',"<color:ff0000>You dingus!<color:ffff00> Narry a man, save admin or super admin, hath the divine power to do hither command!");
 	}
 	else
-	{	
+	{
 		if(%value > 20.0)
 		{
 			messageClient(%client,'',"<color:ffffff>That value is too high to use as the minimum running speed.");
@@ -240,9 +240,9 @@ function serverCmdPeggHelp(%client)
 function servercmdGetPeggPrefs(%client)
 {
 	if(!%client.isAdmin && !%client.isSuperAdmin)
-	{	
+	{
 		messageClient(%client,'',"<color:ff0000>You dingus!<color:ffff00> Narry a man, save admin or super admin, hath the divine power to do hither command!");
-		return; 
+		return;
 	}
 	messageClient(%client,'',"\c6The following is a list of preferences for the \c3Peggy Footsteps\c6 add-on:");
 	messageClient(%client,'',"<color:ffffff>Footsteps Enabled: " @ ($Pref::Server::PF::footstepsEnabled ? "<color:00ff00>enabled" : "<color:ff0000>disabled"));
@@ -251,18 +251,18 @@ function servercmdGetPeggPrefs(%client)
 	messageClient(%client,'',"<color:ffffff>Landing SoundFX: " @ ($Pref::Server::PF::landingFX ? "<color:00ff00>enabled" : "<color:ff0000>disabled"));
 	if ( $Pref::Server::PF::landingFX ) messageClient(%client,'',"<color:ffffff>Landing SoundFX Minimum Speed: <color:ffff00>" @ $Pref::Server::PF::minLandSpeed);
 	messageClient(%client,'',"<color:ffffff>Running Minimum Speed: <color:ffff00>" @ $Pref::Server::PF::runningMinSpeed);
-	messageClient(%client,'',"<color:ffffff>Default Footstep SFX: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::defaultStep, -1) );		 
-	messageClient(%client,'',"<color:ffffff>Terrain Footsteps: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::terrainStep, -1) );		 
-	messageClient(%client,'',"<color:ffffff>Vehicle Footsteps: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::vehicleStep, -1) );		 
+	messageClient(%client,'',"<color:ffffff>Default Footstep SFX: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::defaultStep, -1) );
+	messageClient(%client,'',"<color:ffffff>Terrain Footsteps: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::terrainStep, -1) );
+	messageClient(%client,'',"<color:ffffff>Vehicle Footsteps: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::vehicleStep, -1) );
 	if ( $Pref::Server::PF::brickFXSounds::enabled )
 	{
-		messageClient(%client,'',"<color:ffffff>Pearl SoundFX: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::brickFXsounds::pearlStep, -1) );		 
-		messageClient(%client,'',"<color:ffffff>Chrome SoundFX: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::brickFXsounds::chromeStep, -1) );		 
-		messageClient(%client,'',"<color:ffffff>Glowing SoundFX: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::brickFXsounds::glowStep, -1) );		 
-		messageClient(%client,'',"<color:ffffff>Blinking SoundFX: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::brickFXsounds::blinkStep, -1) );		 
-		messageClient(%client,'',"<color:ffffff>Swirl SoundFX: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::brickFXsounds::swirlStep, -1) );		 
-		messageClient(%client,'',"<color:ffffff>Rainbow SoundFX: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::brickFXsounds::rainbowStep, -1) );		 
-		messageClient(%client,'',"<color:ffffff>Undulo SoundFX: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::brickFXsounds::unduloStep, -1) );		 
+		messageClient(%client,'',"<color:ffffff>Pearl SoundFX: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::brickFXsounds::pearlStep, -1) );
+		messageClient(%client,'',"<color:ffffff>Chrome SoundFX: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::brickFXsounds::chromeStep, -1) );
+		messageClient(%client,'',"<color:ffffff>Glowing SoundFX: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::brickFXsounds::glowStep, -1) );
+		messageClient(%client,'',"<color:ffffff>Blinking SoundFX: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::brickFXsounds::blinkStep, -1) );
+		messageClient(%client,'',"<color:ffffff>Swirl SoundFX: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::brickFXsounds::swirlStep, -1) );
+		messageClient(%client,'',"<color:ffffff>Rainbow SoundFX: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::brickFXsounds::rainbowStep, -1) );
+		messageClient(%client,'',"<color:ffffff>Undulo SoundFX: <color:ffff00>" @ parseSoundFromNumber($Pref::Server::PF::brickFXsounds::unduloStep, -1) );
 	}
 	messageClient(%client,'',"<color:aaaaaa>(PgUp to see all options)");
 }
@@ -276,7 +276,7 @@ function servercmdGetPeggPrefs(%client)
 function serverCmdClearCustomSounds(%client)
 {
 	if( !%client.isAdmin )
-	{	
+	{
 		messageClient(%client,'',"<color:ff0000>You dingus!<color:ffff00> Narry a man, save admin or super admin, hath the divine power to do hither command!");
 		return;
 	}
@@ -292,7 +292,7 @@ function serverCmdClearCustomSounds(%client)
 function serverCmdClearCustomSound(%client)
 {
 	if( !%client.isAdmin )
-	{	
+	{
 		messageClient(%client,'',"<color:ff0000>You dingus!<color:ffff00> Narry a man, save admin or super admin, hath the divine power to do hither command!");
 		return;
 	}
@@ -331,7 +331,7 @@ function serverCmdClearCustomSound(%client)
 			$Pref::Server::PF::customsounds--;
 			messageClient(%client,'',"\c6You have cleared the custom sound for <color:" @ %hex @ ">THIS COLOR\c6.");
 			break;
-		}          
+		}
 		else if ( %i == $Pref::Server::PF::customsounds-1 )
 		{
 			messageClient(%client,'',"\c0Error.\c6 There was no sound effect found for <color:" @ %hex @ ">THIS COLOR\c6.");
@@ -343,9 +343,9 @@ function serverCmdClearCustomSound(%client)
 function servercmdGetCustomSounds(%client)
 {
 	if( !%client.isAdmin )
-	{	
+	{
 		messageClient(%client,'',"<color:ff0000>You dingus!<color:ffff00> Narry a man, save admin or super admin, hath the divine power to do hither command!");
-		return; 
+		return;
 	}
 	messageClient(%client,'',"\c5List of Custom Sounds for Each Color:");
 	for ( %i = 0; %i < $Pref::Server::PF::customsounds; %i++ )
@@ -353,18 +353,18 @@ function servercmdGetCustomSounds(%client)
 		%hit = $Pref::Server::PF::colorPlaysFX[%i];
 		%hitcolor = getWords(%hit, 0, 3);
 		%hitsound = getWord(%hit, 4);
-		%hex =  rgbToHex(%hitcolor); 
-		messageClient(%client,'',"<color:" @ %hex @ ">THIS COLOR\c6 is assigned to the sound '\c4" @ %hitsound @ "\c6'.");	
+		%hex =  rgbToHex(%hitcolor);
+		messageClient(%client,'',"<color:" @ %hex @ ">THIS COLOR\c6 is assigned to the sound '\c4" @ %hitsound @ "\c6'.");
 	}
 }
 
 //+++ Set a color to a new footstep.
 function servercmdSetColorToFootstep(%client, %sound)
-{	
+{
 	if ( !%client.isAdmin )
-	{	
+	{
 		messageClient(%client, '', "<color:ff0000>You dingus!<color:ffff00> Narry a man, save admin or super admin, hath the divine power to do hither command!");
-		return; 
+		return;
 	}
 	%color = getColorIDTable(%client.currentColor);
 	%hex = rgbToHex(%color);
@@ -379,11 +379,11 @@ function servercmdSetColorToFootstep(%client, %sound)
 	%sounds[%i++] = "dirt";
 	%sounds[%i++] = "sand";
 	%match = false;
-	
+
 	for ( %a=0; %a <= %i; %a++ )
 	{
 		if( trim(%sound)$= %sounds[%a] )
-		{	
+		{
 			%match = true;
 			break;
 		}
@@ -411,8 +411,8 @@ function servercmdSetColorToFootstep(%client, %sound)
 		if ( %hr == %r && %hg == %g && %hb == %b)
 		{
 			%hitsound = getWord(%hit, 4);
-			if ( %sound $= %hitsound ) 
-			{  
+			if ( %sound $= %hitsound )
+			{
 				messageClient(%client,'',"\c6The sound, '\c4" @ trim(%sound) @ "\c6', is already playing for <color:" @ %hex @ ">THIS COLOR\c6.");
 				return;
 			}
