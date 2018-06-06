@@ -53,3 +53,5 @@ Temporary Items
 
 .wav
 *.wav
+.directory
+*.directory

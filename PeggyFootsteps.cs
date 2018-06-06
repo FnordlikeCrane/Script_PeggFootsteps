@@ -215,12 +215,13 @@ package peggsteps
 		return parent::onNewDatablock(%this, %obj);
 	}
 
+	// I don't actually know how this built-in function works, but I know this will work.
 	function onMissionEnded(%this, %a, %b, %c, %d)
 	{
 		$PFGlassInit = false;
+		$PFRTBInit = false;
 		return parent::onMissionEnded(%this, %a, %b, %c, %d);
 	}
-
 };
 activatepackage(peggsteps);
 
